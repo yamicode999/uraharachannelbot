@@ -14,8 +14,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY configs.py .
 COPY urahara.py .
 
-# Define environment variable for Telegram bot token (you'll need to set this when running the container)
-ENV TELEGRAM_BOT_TOKEN=your_bot_token_here
-
 # Run mybot.py when the container launches
 CMD ["python", "urahara.py"]
