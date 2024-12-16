@@ -1,5 +1,6 @@
 from pyrogram import Client, enums, filters
 import requests
+import psutil
 import random
 from config import (
     api_id,
@@ -28,6 +29,42 @@ app.set_parse_mode(enums.ParseMode.HTML)
 # Helper function to check if user is an admin
 def is_admin(user_id):
     return user_id in admins
+
+# New function to get system status
+def get_system_status():
+    # Get CPU usage
+    cpu_percent = psutil.cpu_percent(interval=1)
+    
+    # Get memory information
+    memory = psutil.virtual_memory()
+    memory_total = round(memory.total / (1024.0 ** 3), 2)  # Convert to GB
+    memory_used = round(memory.used / (1024.0 ** 3), 2)
+    memory_percent = memory.percent
+
+    return f"CPU Usage: {cpu_percent}%\nMemory Usage: {memory_used}/{memory_total} GB ({memory_percent}%)"
+
+@app.on_message(filters.command("start"))
+async def start(client, message):
+    welcome_message = (
+        "<b>Welcome to the Urahara Shop!</b>\n\n"
+        "<b>✶ /key - Get random vpn key</b>\n"
+        "<b>✶ /configs - Get the VPN configs</b>\n"
+        "<b>✶ /sub - Get subscription link</b>\n"
+        "<b>✶ /status - Check server status</b>\n"  # Added /status command
+        "<b>✶ Send your vpn key here in this format.</b>\n"
+        "<b>  location|key|app</b>\n\n"
+        "<b>Owner Only:</b>\n"
+        "<b>✶ /fetch - Fetch and save new configs</b>\n"
+        "<b>✶ /channel - Change the channel where messages are sent</b>\n"
+        "<b>✶ /authorize - Add new admins</b>\n"
+        "<b>✶ /revoke - Remove admin access</b>\n"
+    )
+    await message.reply(welcome_message)
+
+@app.on_message(filters.command("status"))
+async def server_status(client, message):
+    status = get_system_status()
+    await message.reply(f"<pre><code>{status}</code></pre>", parse_mode=enums.ParseMode.HTML)
 
 @app.on_message(filters.command("start"))
 async def start(client, message):
