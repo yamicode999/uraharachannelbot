@@ -1,4 +1,6 @@
 from pyrogram import Client, enums, filters
+import requests
+import random
 from config import (
     api_id,
     api_hash,
@@ -27,6 +29,50 @@ app.set_parse_mode(enums.ParseMode.HTML)
 def is_admin(user_id):
     return user_id in admins
 
+@app.on_message(filters.command("start"))
+async def start(client, message):
+    welcome_message = (
+        "<b>Welcome to the Urahara Shop!</b>\n\n"
+        "<b>✶ /key - Get random vpn key</b>\n"
+        "<b>✶ /configs - Get the VPN configs</b>\n"
+        "<b>✶ /sub - Get subscription link</b>\n"
+        "<b>✶ Send your vpn key here in this format.</b>\n"
+        "<b>  location|key|app</b>\n\n"
+        "<b>Owner Only:</b>\n"
+        "<b>✶ /fetch - Fetch and save new configs</b>\n"
+        "<b>✶ /channel - Change the channel where messages are sent</b>\n"
+        "<b>✶ /authorize - Add new admins</b>\n"
+        "<b>✶ /revoke - Remove admin access</b>\n"
+    )
+    await message.reply(welcome_message)
+
+@app.on_message(filters.command("key"))
+async def send_random_config(client, message):
+    try:
+        with open("configs.txt", "r", encoding="utf-8") as file:
+            lines = file.readlines()
+            if lines:
+                random_line = random.choice(lines).strip()
+                await message.reply(
+                    f"<pre><code>{random_line}</code></pre>",
+                    parse_mode=enums.ParseMode.HTML
+                    )
+            else:
+                await message.reply("The configs file is empty. Use /fetchconfigs to update configs.")
+    except FileNotFoundError:
+        await message.reply("No configs available. Please use /fetchconfigs to fetch configs first.")
+    except Exception as e:
+        await message.reply(f"An error occurred: {str(e)}")
+
+@app.on_message(filters.command("sub"))
+async def start(client, message):
+    welcome_message = (
+                    "<b>Subscription Link:</b>\n\n"
+                    "<pre><code>https://github.com/yamicode999/myshittytesttt/raw/refs/heads/main/6M22D.txt</code></pre>\n\n"
+                    "<b>Usable in: Hiddify, V2Box, V2rayNg, Neko Box</b>"
+                )
+    await message.reply(welcome_message)
+
 # Change channel command - only for owner
 @app.on_message(filters.command("channel") & filters.user(OWNER_ID))
 async def change_channel(client, message):
@@ -47,7 +93,6 @@ async def authorize_admin(client, message):
         if user_id not in admins:
             admins.append(user_id)
             await message.reply(f"User {user_id} has been added as an admin.")
-            #print(admins)
         else:
             await message.reply("This user is already an admin.")
     except (IndexError, ValueError):
@@ -62,11 +107,34 @@ async def revoke_admin(client, message):
         if user_id in admins:
             admins.remove(user_id)
             await message.reply(f"Admin access revoked for user {user_id}.")
-            #print(admins)
         else:
             await message.reply("This user is not an admin.")
     except (IndexError, ValueError):
         await message.reply("Please use: /revoke <telegram_user_id>")
+
+# Fetch configs from V2ray subscription - only for owner
+@app.on_message(filters.command("fetch") & filters.user(OWNER_ID))
+async def fetch_configs(client, message):
+    url = "https://github.com/yamicode999/myshittytesttt/raw/refs/heads/main/6M22D.txt"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        with open("configs.txt", "w", encoding="utf-8") as file:  # Specify UTF-8 encoding
+            file.write(response.text)
+        await message.reply("Configs fetched and saved as configs.txt.")
+    except requests.RequestException as e:
+        await message.reply(f"Failed to fetch configs: {str(e)}")
+
+# Send configs to any user
+@app.on_message(filters.command("configs"))
+async def send_configs(client, message):
+    try:
+        with open("configs.txt", "r", encoding="utf-8") as file:
+            configs_content = file.read()
+        # Use either the file name or the content, not both
+        await message.reply_document(document="configs.txt")
+    except FileNotFoundError:
+        await message.reply("No configs available. Please use /fetchconfigs to fetch configs first.")
 
 # Function to process and send formatted messages
 @app.on_message(filters.private)
@@ -76,8 +144,8 @@ async def send_formatted_message(client, message):
             try:
                 location, key, usable_apps = message.text.split("|", 2)
                 formatted_text = (
-                    f"<b>{location.strip()}</b>\n\n"
-                    f"<pre><code>{key.strip()}</code></pre>\n\n"
+                    f"<b>{location.strip()}</b><br><br>"
+                    f"<pre><code>{key.strip()}</code></pre><br><br>"
                     f"<b>Usable in: {usable_apps.strip()}</b>"
                 )
                 await client.send_message(
