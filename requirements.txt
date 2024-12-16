@@ -1,2 +1,4 @@
 Pyrogram
 requests
+TgCrypto
+psutil
