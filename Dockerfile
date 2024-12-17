@@ -37,8 +37,6 @@ RUN apt-get update && apt-get install -y \
     make \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir -r /app/requirements.txt
-
 # Create a directory for Python packages
 RUN mkdir -p /app
 
