@@ -19,10 +19,10 @@ RUN apt-get update && apt-get install -y \
 COPY --from=python-runtime /usr/local/bin/python3.9 /usr/local/bin/python3.9
 COPY --from=python-runtime /usr/local/lib/python3.9 /usr/local/lib/python3.9
 
-# Create symbolic links for 'python3' and 'pip3' if needed
-RUN ln -s /usr/local/bin/python3.9 /usr/local/bin/python3
-RUN ln -s /usr/local/bin/python3.9 /usr/bin/python3
-RUN ln -s /usr/local/lib/python3.9/pip /usr/local/bin/pip3
+# Create symbolic links for 'python3' and 'pip3' if needed, but only if they don't exist
+RUN if [ ! -e /usr/local/bin/python3 ]; then ln -s /usr/local/bin/python3.9 /usr/local/bin/python3; fi
+RUN if [ ! -e /usr/bin/python3 ]; then ln -s /usr/local/bin/python3.9 /usr/bin/python3; fi
+RUN if [ ! -e /usr/local/bin/pip3 ]; then ln -s /usr/local/lib/python3.9/pip /usr/local/bin/pip3; fi
 
 # Verify Python installation
 RUN python3 --version
@@ -33,7 +33,6 @@ ENV PYTHONPATH=/usr/local/lib/python3.9/site-packages
 # Rest of your Dockerfile setup here
 # ... (your existing COPY commands, etc.)
 
-# Install Python dependencies
 WORKDIR /app
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
