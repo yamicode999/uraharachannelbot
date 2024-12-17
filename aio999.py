@@ -22,7 +22,7 @@ output_file = os.path.join(configs_folder, "allconfigs.txt")
 detrojan_file = os.path.join(configs_folder, "detrojan.txt")
 detrojaned_file = os.path.join(configs_folder, "detrojaned.txt")
 aio_file = os.path.join(configs_folder, "aio.txt")
-output_file = os.path.join(configs_folder, "6M22D.txt")
+output_file_aio = os.path.join(configs_folder, "6M22D.txt")
 
 def fetch_and_process_urls():
     """
@@ -302,14 +302,14 @@ async def handle_sub_file(client, message):
         updated_lines = process_file(aio_file)
         
         # Write the processed lines to the output file
-        with open(output_file, "w", encoding="utf-8") as out_file:
+        with open(output_file_aio, "w", encoding="utf-8") as out_file:
             out_file.write("\n".join(updated_lines))
 
         # Send back the processed file
-        await client.send_document(chat_id=OWNER_ID, document=output_file)
+        await client.send_document(chat_id=OWNER_ID, document=output_file_aio)
         
         # Delete temporary files
-        for file_path in [aio_file, output_file]:
+        for file_path in [aio_file, output_file_aio]:
             if os.path.exists(file_path):
                 os.remove(file_path)
                 print(f"Deleted file: {file_path}")
