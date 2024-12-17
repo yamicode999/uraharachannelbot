@@ -216,7 +216,7 @@ async def send_formatted_message(client, message):
 # Run both the bot and the simple HTTP server
 async def main():
     # Start Pyrogram bot
-    await app.run()
+    await app.start()
     print("Bot is running...")
 
     # Start HTTP server for health checks
