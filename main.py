@@ -213,15 +213,31 @@ async def send_formatted_message(client, message):
     else:
         await message.reply("You're not authorized to use the bot.")
 
-# Run both the bot and the simple HTTP server
 async def main():
     # Start Pyrogram bot
     await app.start()
     print("Bot is running...")
 
-    # Start HTTP server for health checks
-    with socketserver.TCPServer(("", PORT), HealthCheckHandler) as httpd:
-        print(f"Serving HTTP on port {PORT}")
-        await asyncio.to_thread(httpd.serve_forever)
+    # Start HTTP server for health checks in a separate task
+    server = socketserver.TCPServer(("", PORT), HealthCheckHandler)
+    print(f"Serving HTTP on port {PORT}")
+    httpd_task = asyncio.create_task(asyncio.to_thread(server.serve_forever))
 
-asyncio.run(main())
+    # Keep the bot running by waiting for a signal to stop
+    try:
+        while True:
+            await asyncio.sleep(1)  # Keep the main coroutine running
+    except KeyboardInterrupt:
+        # Handle graceful shutdown
+        pass
+    finally:
+        # Stop HTTP server
+        server.shutdown()
+        await app.stop()
+        print("Bot and server stopped.")
+
+    # Wait for the HTTP server task to complete
+    await httpd_task
+
+if __name__ == "__main__":
+    asyncio.run(main())
