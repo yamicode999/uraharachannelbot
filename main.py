@@ -97,7 +97,7 @@ async def send_random_config(client, message):
             else:
                 await message.reply("The configs file is empty. Use /fetchconfigs to update configs.")
     except FileNotFoundError:
-        await message.reply("No configs available. Please use /fetchconfigs to fetch configs first.")
+        await message.reply("No configs available. Please use /fetch to fetch configs first.")
     except Exception as e:
         await message.reply(f"An error occurred: {str(e)}")
 
@@ -113,13 +113,20 @@ async def start(client, message):
 # Change channel command - only for owner
 @app.on_message(filters.command("channel") & filters.user(OWNER_ID))
 async def change_channel(client, message):
+    global CHANNEL_ID
     try:
         new_channel = message.command[1]
-        global CHANNEL_ID
-        CHANNEL_ID = new_channel
+        # If it's a username, fetch the channel ID
+        if new_channel.startswith('@'):
+            chat = await client.get_chat(new_channel)
+            CHANNEL_ID = chat.id
+        else:
+            CHANNEL_ID = int(new_channel)  # Assuming direct ID input
         await message.reply(f"Channel changed to {new_channel}")
     except IndexError:
         await message.reply("Please use: /channel <channel_username or id>")
+    except ValueError:
+        await message.reply("Invalid channel ID or username format.")
 
 # Authorize new admin
 @app.on_message(filters.command("authorize") & filters.user(OWNER_ID))
