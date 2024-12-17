@@ -18,6 +18,10 @@ RUN apt-get update && apt-get install -y \
 # Copy Python 3.9 from our Python runtime image
 COPY --from=python-runtime /usr/local/bin/python3.9 /usr/local/bin/python3.9
 COPY --from=python-runtime /usr/local/lib/python3.9 /usr/local/lib/python3.9
+COPY --from=python-runtime /usr/local/lib/libpython3.9.so* /usr/local/lib/
+
+# Adjust library path
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # Create symbolic links for 'python3' and 'pip3' if needed, but only if they don't exist
 RUN if [ ! -e /usr/local/bin/python3 ]; then ln -s /usr/local/bin/python3.9 /usr/local/bin/python3; fi
@@ -43,5 +47,4 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Expose port 80 for Nginx
 EXPOSE 8080
 
-# Run Nginx in the foreground and start the Python bot in the background
-CMD ["sh", "-c", "nginx -g 'daemon off;' & python3 /app/main.py"]
+# Run
