@@ -9,8 +9,6 @@ from config import (
     owner_id,
     channel_id
 )
-from fastapi import FastAPI
-import uvicorn
 
 # Configuration
 API_ID = api_id  
@@ -45,13 +43,6 @@ def get_system_status():
 
     return f"CPU Usage: {cpu_percent}%\nMemory Usage: {memory_used}/{memory_total} GB ({memory_percent}%)"
 
-# Health check endpoint with FastAPI
-app_health = FastAPI()
-
-@app_health.get("/health")
-async def health_check():
-    return {"status": "healthy"}
-
 @app.on_message(filters.command("start"))
 async def start(client, message):
     welcome_message = (
@@ -59,7 +50,7 @@ async def start(client, message):
         "<b>✶ /key - Get random vpn key</b>\n"
         "<b>✶ /configs - Get the VPN configs</b>\n"
         "<b>✶ /sub - Get subscription link</b>\n"
-        "<b>✶ /status - Check server status</b>\n"  
+        "<b>✶ /status - Check server status</b>\n"  # Added /status command
         "<b>✶ Send your vpn key here in this format.</b>\n"
         "<b>  location|key|app</b>\n\n"
         "<b>Owner Only:</b>\n"
@@ -75,6 +66,23 @@ async def server_status(client, message):
     status = get_system_status()
     await message.reply(f"<pre><code>{status}</code></pre>", parse_mode=enums.ParseMode.HTML)
 
+@app.on_message(filters.command("start"))
+async def start(client, message):
+    welcome_message = (
+        "<b>Welcome to the Urahara Shop!</b>\n\n"
+        "<b>✶ /key - Get random vpn key</b>\n"
+        "<b>✶ /configs - Get the VPN configs</b>\n"
+        "<b>✶ /sub - Get subscription link</b>\n"
+        "<b>✶ Send your vpn key here in this format.</b>\n"
+        "<b>  location|key|app</b>\n\n"
+        "<b>Owner Only:</b>\n"
+        "<b>✶ /fetch - Fetch and save new configs</b>\n"
+        "<b>✶ /channel - Change the channel where messages are sent</b>\n"
+        "<b>✶ /authorize - Add new admins</b>\n"
+        "<b>✶ /revoke - Remove admin access</b>\n"
+    )
+    await message.reply(welcome_message)
+
 @app.on_message(filters.command("key"))
 async def send_random_config(client, message):
     try:
@@ -85,7 +93,7 @@ async def send_random_config(client, message):
                 await message.reply(
                     f"<pre><code>{random_line}</code></pre>",
                     parse_mode=enums.ParseMode.HTML
-                )
+                    )
             else:
                 await message.reply("The configs file is empty. Use /fetchconfigs to update configs.")
     except FileNotFoundError:
@@ -96,10 +104,10 @@ async def send_random_config(client, message):
 @app.on_message(filters.command("sub"))
 async def start(client, message):
     welcome_message = (
-        "<b>Subscription Link:</b>\n\n"
-        "<pre><code>https://github.com/yamicode999/myshittytesttt/raw/refs/heads/main/6M22D.txt</code></pre>\n\n"
-        "<b>Usable in: Hiddify, V2Box, V2rayNg, Neko Box</b>"
-    )
+                    "<b>Subscription Link:</b>\n\n"
+                    "<pre><code>https://github.com/yamicode999/myshittytesttt/raw/refs/heads/main/6M22D.txt</code></pre>\n\n"
+                    "<b>Usable in: Hiddify, V2Box, V2rayNg, Neko Box</b>"
+                )
     await message.reply(welcome_message)
 
 # Change channel command - only for owner
@@ -148,7 +156,7 @@ async def fetch_configs(client, message):
     try:
         response = requests.get(url)
         response.raise_for_status()
-        with open("configs.txt", "w", encoding="utf-8") as file:
+        with open("configs.txt", "w", encoding="utf-8") as file:  # Specify UTF-8 encoding
             file.write(response.text)
         await message.reply("Configs fetched and saved as configs.txt.")
     except requests.RequestException as e:
@@ -160,6 +168,7 @@ async def send_configs(client, message):
     try:
         with open("configs.txt", "r", encoding="utf-8") as file:
             configs_content = file.read()
+        # Use either the file name or the content, not both
         await message.reply_document(document="configs.txt")
     except FileNotFoundError:
         await message.reply("No configs available. Please use /fetchconfigs to fetch configs first.")
@@ -188,18 +197,6 @@ async def send_formatted_message(client, message):
     else:
         await message.reply("You're not authorized to use the bot.")
 
-# Run both the bot and the health check server
-if __name__ == "__main__":
-    import asyncio
-
-    async def main():
-        # Start Pyrogram bot
-        await app.start()
-        print("Bot is running...")
-        
-        # Start health check server
-        config = uvicorn.Config(app_health, host="0.0.0.0", port=80, log_level="info")
-        server = uvicorn.Server(config)
-        await server.serve()
-
-    asyncio.run(main())
+# Run the bot
+print("Bot is running...")
+app.run()
