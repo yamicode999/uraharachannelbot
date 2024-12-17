@@ -1,5 +1,5 @@
 # Use a Python image with more development tools
-FROM python:3.10-slim as bot
+FROM python:3.9 as bot
 
 # Set the working directory in the container
 WORKDIR /app
