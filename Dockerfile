@@ -1,4 +1,4 @@
-# Use an official Python runtime as a parent image for the bot part
+# Use Python as the base image for the bot part
 FROM python:3.9-slim as bot
 
 # Set the working directory in the container
@@ -10,14 +10,17 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Use the official nginx image for the web server part
-FROM nginx:latest as nginx
+# Use Nginx as the final image
+FROM nginx:latest
+
+# Copy over the Python bot code
+COPY --from=bot /app /app
+
+# Install Python 3 in the Nginx image
+RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
 
 # Copy our custom nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy over the Python bot into the nginx container for simplicity
-COPY --from=bot /app /app
 
 # Expose port 80 for Nginx
 EXPOSE 80
