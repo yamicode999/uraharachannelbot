@@ -20,7 +20,7 @@ BOT_TOKEN = bot_token
 CHANNEL_ID = channel_id  
 OWNER_ID = owner_id 
 
-PORT = 80
+PORT = 8080
 
 # Simple HTTP server for health checks
 class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):
@@ -216,7 +216,7 @@ async def send_formatted_message(client, message):
 # Run both the bot and the simple HTTP server
 async def main():
     # Start Pyrogram bot
-    await app.start()
+    await app.run()
     print("Bot is running...")
 
     # Start HTTP server for health checks
