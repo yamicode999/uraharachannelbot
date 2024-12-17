@@ -4,6 +4,12 @@ FROM python:3.9-slim as bot
 # Set the working directory in the container
 WORKDIR /app
 
+# Install system dependencies needed for TgCrypto
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 
@@ -13,8 +19,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Use Nginx for the final image
 FROM nginx:latest
 
-# Install Python 3 in the Nginx image
-RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
+# Install Python 3 in the Nginx image along with build essentials for TgCrypto
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    build-essential \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a directory for Python packages
 RUN mkdir -p /app
