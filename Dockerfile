@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=python-runtime /usr/local/bin/python3.9 /usr/local/bin/python3.9
 COPY --from=python-runtime /usr/local/lib/python3.9 /usr/local/lib/python3.9
 COPY --from=python-runtime /usr/local/lib/libpython3.9.so* /usr/local/lib/
+COPY --from=python-runtime /usr/local/bin/pip3 /usr/local/bin/pip3
 
 # Adjust library path
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
@@ -26,10 +27,11 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 # Create symbolic links for 'python3' and 'pip3' if needed, but only if they don't exist
 RUN if [ ! -e /usr/local/bin/python3 ]; then ln -s /usr/local/bin/python3.9 /usr/local/bin/python3; fi
 RUN if [ ! -e /usr/bin/python3 ]; then ln -s /usr/local/bin/python3.9 /usr/bin/python3; fi
-RUN if [ ! -e /usr/local/bin/pip3 ]; then ln -s /usr/local/lib/python3.9/pip /usr/local/bin/pip3; fi
+RUN if [ ! -e /usr/local/bin/pip3 ]; then ln -s /usr/local/bin/pip3 /usr/local/bin/pip3; fi
 
 # Verify Python installation
 RUN python3 --version
+RUN pip3 --version
 
 # Set Python path to ensure Python can find the installed packages
 ENV PYTHONPATH=/usr/local/lib/python3.9/site-packages
@@ -47,4 +49,5 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Expose port 80 for Nginx
 EXPOSE 8080
 
-# Run
+# Run Nginx in the foreground and start the Python bot in the background
+CMD ["sh", "-c", "nginx -g 'daemon off;' & python3 /app/main.py"]
