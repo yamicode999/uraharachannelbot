@@ -1,5 +1,5 @@
-# Use Python for building the bot
-FROM python:3.9-slim as bot
+# Use a Python image with more development tools
+FROM python:3.9 as bot
 
 # Set the working directory in the container
 WORKDIR /app
@@ -8,6 +8,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libssl-dev \
+    gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the current directory contents into the container at /app
@@ -25,6 +27,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     build-essential \
     libssl-dev \
+    gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a directory for Python packages
