@@ -1,53 +1,45 @@
-# Use a Python image with more development tools
-FROM python:3.9 as bot
+# Stage 1: Build and prepare the Python bot
+FROM python:3.9-slim as bot
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Install system dependencies needed for TgCrypto
+# Install system dependencies required for TgCrypto and Python builds
 RUN apt-get update && apt-get install -y \
     build-essential \
     libssl-dev \
-    gcc \
     python3-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the current directory contents into the container at /app
+# Copy the application code to the container
 COPY . /app
 
-# Install any needed packages specified in requirements.txt
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Use Nginx for the final image
-FROM nginx:latest
+# Stage 2: Production-ready image with Nginx and Python runtime
+FROM nginx:stable-slim
 
-# Install Python 3 in the Nginx image along with build essentials for TgCrypto
+# Set the working directory
+WORKDIR /app
+
+# Install Python 3 and necessary dependencies in the Nginx image
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
-    build-essential \
     libssl-dev \
-    gcc \
-    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a directory for Python packages
-RUN mkdir -p /app
-
-# Copy Python application files
+# Copy the Python bot and dependencies from the build stage
 COPY --from=bot /app /app
-
-# Copy Python site-packages
 COPY --from=bot /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 
-# Copy our custom nginx config
+# Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80 for Nginx
 EXPOSE 80
 
-# Set Python path to ensure Python can find the installed packages
-ENV PYTHONPATH=/usr/local/lib/python3.9/site-packages
-
-# Run Nginx in the foreground and start the Python bot in the background
-CMD ["sh", "-c", "nginx -g 'daemon off;' & python3 /app/main.py"]
+# Start Nginx and Python bot together
+CMD ["sh", "-c", "python3 /app/main.py & nginx -g 'daemon off;'"]
