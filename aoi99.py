@@ -653,8 +653,8 @@ async def handle_sub_file(client, message):
                         f"<b>Usable in: {usable_apps.strip()}</b>"
                     )
                     await client.send_message(
-                        "channel_username_or_id",  # Replace with your channel's username or ID
-                        formatted_text,
+                        chat_id=CHANNEL_ID,  # Replace with your channel's username or ID
+                        text=formatted_text,
                         parse_mode=enums.ParseMode.HTML
                     )
 
