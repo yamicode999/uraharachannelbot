@@ -415,6 +415,7 @@ async def start(client, message):
             "<b>✶ send detrojan.txt - Remove trojan urls</b>\n"
             "<b>✶ send aio.txt - Change Name and server</b>\n"
             "<b>✶ send 6M22D.txt - Upload to github</b>\n"
+            "<b>✶ send post.txt - Post on channel</b>\n"
         )
         await message.reply(welcome_message)
     else:
