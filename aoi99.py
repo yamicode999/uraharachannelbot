@@ -393,7 +393,7 @@ async def start(client, message):
         "<b>Welcome to the Urahara Shop!</b>\n\n"
         "<b>✶ /key - Get random vpn key</b>\n"
         "<b>✶ /sub - Get subscription link</b>\n"
-        "<b>✶ /status - Check server status</b>\n"  # Added /status command
+        "<b>✶ /app - Download Usable Apps</b>\n"
         "<b>✶ You can share your vpn key,</b>\n"
         "<b>   Just by sending to the bot!</b>\n\n"
         "<b>Owner Only:</b>\n"
@@ -403,11 +403,29 @@ async def start(client, message):
     )
     await message.reply(welcome_message)
 
+@app.on_message(filters.command("app"))
+async def start(client, message):
+    welcome_message = (
+        "<b>FOR PC:</b>\n"
+        '<b>✶ <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.Msix">Hiddify</a></b>\n\n'
+        "<b>FOR IOS:</b>\n"
+        '<b>✶ <a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone">Hiddify</a></b>\n'
+        '<b>✶ <a href="https://apps.apple.com/us/app/v2box-v2ray-client/id6446814690">V2BOx</a></b>\n'
+        '<b>✶ <a href="https://apps.apple.com/us/app/potatso/id1239860606">Potatso</a></b>\n\n'
+        "<b>FOR ANDROID:</b>\n"
+        '<b>✶ <a href="https://play.google.com/store/apps/details?id=app.hiddify.com">Hiddify</a></b>\n'
+        '<b>✶ <a href="https://play.google.com/store/apps/details?id=com.v2ray.ang">V2rayNG</a></b>\n'
+        '<b>✶ <a href="https://github.com/MatsuriDayo/NekoBoxForAndroid/releases/download/1.3.4/NB4A-1.3.4-armeabi-v7a.apk">Neko Box</a></b>\n'
+        '<b>✶ <a href="https://play.google.com/store/apps/details?id=com.github.shadowsocks">Shadowsocks</a></b>\n'
+    )
+    await message.reply(welcome_message, disable_web_page_preview=True)
+
 @app.on_message(filters.command("cmd"))
 async def start(client, message):
     if message.from_user.id == owner_id:
         welcome_message = (
             "<b>Owner Commands:</b>\n\n"
+            "<b>✶ /status - Check server status</b>\n"
             "<b>✶ /fetch - Fetch and save new configs</b>\n"
             "<b>✶ /fetchall - Fetch and save raw configs</b>\n"
             "<b>✶ /channel - Change the channel where messages are sent</b>\n"
@@ -731,20 +749,22 @@ async def send_formatted_message(client, message):
         if message.text is not None:
             message_text = message.text.strip()
             if message_text.startswith(("vmess://", "vless://", "ss://", "hy2://")):
-                # Determine usable apps based on the URL protocol
                 if message_text.startswith("ss://"):
                     usable_apps = "Hiddify, Potatso, Neko Box, Shadowsocks"
                     country_info = process_shadowsocks_country(message_text)
-                    
-                elif message_text.startswith(("vmess://", "vless://")):
+                        
+                elif message_text.startswith("vmess://"):
                     usable_apps = "Hiddify, V2Box, V2rayNG, Neko Box"
                     country_info = process_vmess_country(message_text)
+
+                elif message_text.startswith("vless://"):
+                    usable_apps = "Hiddify, V2Box, V2rayNG, Neko Box"
                     country_info = process_vless_country(message_text)
-                    
+                        
                 elif message_text.startswith("hy2://"):
                     usable_apps = "Hiddify, Neko Box"
                     country_info = process_hy2_country(message_text)
-                    
+                        
                 else:
                     usable_apps = "Unknown"
                     country_info = "Unknown"
