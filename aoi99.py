@@ -393,13 +393,13 @@ async def start(client, message):
         "<b>Welcome to the Urahara Shop!</b>\n\n"
         "<b>✶ /key - Get random vpn key</b>\n"
         "<b>✶ /sub - Get subscription link</b>\n"
-        "<b>✶ /app - Download Usable Apps</b>\n"
-        "<b>✶ You can share your vpn key,</b>\n"
-        "<b>   Just by sending to the bot!</b>\n\n"
+        "<b>✶ /app - Download Usable Apps</b>\n\n"
         "<b>Owner Only:</b>\n"
         "<b>✶ /cmd - Get all commands</b>\n"
         "<b>✶ @onepass_api - Contact Owner</b>\n\n"
         "<b>:VPN Keys are updated daily.</b>\n"
+        "<b>:You can share your vpn key,</b>\n"
+        "<b> Just by sending to the bot!</b>\n"
     )
     await message.reply(welcome_message)
 
