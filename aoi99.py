@@ -566,6 +566,8 @@ async def fetch_configs(client, message):
 @app.on_message(filters.document & filters.user(OWNER_ID))
 async def handle_sub_file(client, message):
     if message.document.file_name == 'sub.txt':
+        # Ensure the sub_folder variable is defined
+        os.makedirs(sub_folder, exist_ok=True)  # Create the folder if it doesn't exist
         await client.download_media(message, file_name=os.path.join(sub_folder, 'sub.txt'))
         await message.reply("Sub.txt file saved.")
 
