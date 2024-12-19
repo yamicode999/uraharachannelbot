@@ -399,6 +399,7 @@ async def start(client, message):
         "<b>Owner Only:</b>\n"
         "<b>✶ /cmd - Get all commands</b>\n"
         "<b>✶ @onepass_api - Contact Owner</b>\n"
+        "<b>VPN Keys are updated daily.</b>\n"
     )
     await message.reply(welcome_message)
 
@@ -698,7 +699,7 @@ async def send_random_config(client, message):
             else:
                 await message.reply("The configs file is empty.")
     except FileNotFoundError:
-        await message.reply("No configs.json file found.")
+        await message.reply("<b>VPN Key is not available rn.</b>")
     except json.JSONDecodeError:
         await message.reply("Error decoding JSON in configs.json.")
     except Exception as e:
@@ -708,23 +709,24 @@ async def send_random_config(client, message):
 @app.on_message(filters.private)
 async def send_formatted_message(client, message):
     if message.from_user.id in admins:
-        if "|" in message.text:
-            try:
-                location, key, usable_apps = message.text.split("|", 2)
-                formatted_text = (
-                    f"<b>{location.strip()}</b>\n\n"
-                    f"<pre><code>{key.strip()}</code></pre>\n\n"
-                    f"<b>Usable in: {usable_apps.strip()}</b>"
-                )
-                await client.send_message(
-                    chat_id=CHANNEL_ID,
-                    text=formatted_text
-                )
-                await message.reply("Message sent successfully!")
-            except ValueError:
-                await message.reply("Invalid format. Use Location|Key|Usable Apps.")
-        else:
-            await message.reply("Please use the correct format: Location|Key|Usable Apps.")
+        if message.text is not None:
+            if "|" in message.text:
+                try:
+                    location, key, usable_apps = message.text.split("|", 2)
+                    formatted_text = (
+                        f"<b>{location.strip()}</b>\n\n"
+                        f"<pre><code>{key.strip()}</code></pre>\n\n"
+                        f"<b>Usable in: {usable_apps.strip()}</b>"
+                    )
+                    await client.send_message(
+                        chat_id=CHANNEL_ID,
+                        text=formatted_text
+                    )
+                    await message.reply("Message sent successfully!")
+                except ValueError:
+                    await message.reply("Invalid format. Use Location|Key|Usable Apps.")
+            else:
+                await message.reply("Please use the correct format: Location|Key|Usable Apps.")
     else:
         if message.text is not None:
             message_text = message.text.strip()
@@ -749,9 +751,9 @@ async def send_formatted_message(client, message):
                     chat_id=soto_id,
                     text=formatted_text
                 )
-                await message.reply("Thank you for sharing your key!")
+                await message.reply("<b>Thank you for sharing your key!</b>")
             else:
-                await message.reply("Please only send VMess, VLess, Shadowsocks or Hysteria key.")
+                await message.reply("<b>Please only send VMess, VLess, Shadowsocks or Hysteria key.</b>")
 
 # Run the bot
 print("Bot is running...")
