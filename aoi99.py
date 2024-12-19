@@ -25,7 +25,7 @@ detrojaned_file = os.path.join(configs_folder, "detrojaned.txt")
 aio_file = os.path.join(configs_folder, "aio.txt")
 output_file_aio = os.path.join(configs_folder, "6M22D.txt")
 
-github_token = "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"
+github_token = "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"
 github_user = "aoisora999"  # Replace with your GitHub username
 github_repo = "6M22D"
 
