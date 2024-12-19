@@ -569,7 +569,7 @@ async def handle_sub_file(client, message):
         # Ensure the sub_folder variable is defined
         os.makedirs(sub_folder, exist_ok=True)  # Create the folder if it doesn't exist
         await client.download_media(message, file_name=os.path.join(sub_folder, 'sub.txt'))
-        await message.reply("Sub.txt file saved.")
+        await message.reply("<b>Sub.txt file saved.</b>")
 
     elif message.document.file_name == 'detrojan.txt':
         await client.download_media(message, file_name=detrojan_file)
