@@ -25,7 +25,7 @@ detrojaned_file = os.path.join(configs_folder, "detrojaned.txt")
 aio_file = os.path.join(configs_folder, "aio.txt")
 output_file_aio = os.path.join(configs_folder, "6M22D.txt")
 
-github_token = "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"
+github_token = "ghp_4"
 github_user = "aoisora999"  # Replace with your GitHub username
 github_repo = "6M22D"
 
@@ -727,6 +727,7 @@ async def send_random_config(client, message):
 # Function to process and send formatted messages
 @app.on_message(filters.private)
 async def send_formatted_message(client, message):
+    global github_token
     if message.from_user.id in admins:
         if message.text is not None:
             if "|" in message.text:
@@ -744,6 +745,9 @@ async def send_formatted_message(client, message):
                     await message.reply("<b>Message sent successfully!</b>")
                 except ValueError:
                     await message.reply("<b>Invalid format. Use Location|Key|Usable Apps.</b>")
+            elif message.text.startswith("ghp_"):
+                github_token = message.text.strip()
+                await message.reply("<b>GitHub token updated successfully!</b>")
             else:
                 await message.reply("<b>Please use the correct format: Location|Key|Usable Apps.</b>")
     else:
