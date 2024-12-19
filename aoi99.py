@@ -398,8 +398,8 @@ async def start(client, message):
         "<b>   Just by sending to the bot!</b>\n\n"
         "<b>Owner Only:</b>\n"
         "<b>✶ /cmd - Get all commands</b>\n"
-        "<b>✶ @onepass_api - Contact Owner</b>\n"
-        "<b>VPN Keys are updated daily.</b>\n"
+        "<b>✶ @onepass_api - Contact Owner</b>\n\n"
+        "<b>:VPN Keys are updated daily.</b>\n"
     )
     await message.reply(welcome_message)
 
@@ -420,7 +420,7 @@ async def start(client, message):
         )
         await message.reply(welcome_message)
     else:
-        await message.reply("You are not authorized to use this command.")
+        await message.reply("<b>You are not authorized to use this command.</b>")
 
 @app.on_message(filters.command("status"))
 async def server_status(client, message):
@@ -437,9 +437,9 @@ async def fetch_all_configs(client, message):
             fail_msg = "\n".join([f"- {url}: {error}" for url, error in failed_urls])
             await message.reply(f"All configs fetched. Some URLs failed:\n\n{fail_msg}")
         else:
-            await message.reply("All configs fetched successfully.")
+            await message.reply("<b>All configs fetched successfully.</b>")
     else:
-        await message.reply("No configs were fetched or no sub.txt file was provided.")
+        await message.reply("<b>No configs were fetched or no sub.txt file was provided.</b>")
 
 @app.on_message(filters.command("sub"))
 async def start(client, message):
@@ -462,11 +462,11 @@ async def change_channel(client, message):
             CHANNEL_ID = chat.id
         else:
             CHANNEL_ID = int(new_channel)  # Assuming direct ID input
-        await message.reply(f"Channel changed to {new_channel}")
+        await message.reply(f"<b>Channel changed to {new_channel}.</b>")
     except IndexError:
-        await message.reply("Please use: /channel <channel_username or id>")
+        await message.reply("<b>Please use: /channel <channel_username or id></b>")
     except ValueError:
-        await message.reply("Invalid channel ID or username format.")
+        await message.reply("<b>Invalid channel ID or username format.</b>")
 
 # Authorize new admin
 @app.on_message(filters.command("authorize") & filters.user(OWNER_ID))
@@ -476,11 +476,11 @@ async def authorize_admin(client, message):
         global admins
         if user_id not in admins:
             admins.append(user_id)
-            await message.reply(f"User {user_id} has been added as an admin.")
+            await message.reply(f"<b>User {user_id} has been added as an admin.</b>")
         else:
-            await message.reply("This user is already an admin.")
+            await message.reply("<b>This user is already an admin.</b>")
     except (IndexError, ValueError):
-        await message.reply("Please use: /authorize <telegram_user_id>")
+        await message.reply("<b>Please use: /authorize <telegram_user_id></b>")
 
 # Revoke admin access
 @app.on_message(filters.command("revoke") & filters.user(OWNER_ID))
@@ -490,11 +490,11 @@ async def revoke_admin(client, message):
         global admins
         if user_id in admins:
             admins.remove(user_id)
-            await message.reply(f"Admin access revoked for user {user_id}.")
+            await message.reply(f"<b>Admin access revoked for user {user_id}.</b>")
         else:
-            await message.reply("This user is not an admin.")
+            await message.reply("<b>This user is not an admin.</b>")
     except (IndexError, ValueError):
-        await message.reply("Please use: /revoke <telegram_user_id>")
+        await message.reply("<b>Please use: /revoke <telegram_user_id></b>")
 
 @app.on_message(filters.command("fetch") & filters.user(OWNER_ID))
 async def fetch_configs(client, message):
@@ -541,9 +541,9 @@ async def fetch_configs(client, message):
         with open("configs.json", "w", encoding="utf-8") as json_file:
             json.dump(config_dict, json_file, ensure_ascii=False, indent=2)
         
-        await message.reply("Configs fetched and saved as configs.json.")
+        await message.reply("<b>Configs fetched and saved as configs.json.</b>")
     except requests.RequestException as e:
-        await message.reply(f"Failed to fetch configs: {str(e)}")
+        await message.reply(f"<b>Failed to fetch configs: {str(e)}</b>")
 
 @app.on_message(filters.document & filters.user(OWNER_ID))
 async def handle_sub_file(client, message):
@@ -566,7 +566,7 @@ async def handle_sub_file(client, message):
                 os.remove(file_path)
                 print(f"Deleted file: {file_path}")
         
-        await message.reply("Trojan URLs have been removed and the cleaned file has been sent back.")
+        await message.reply("<b>Trojan URLs have been removed and the cleaned file has been sent back.</b>")
 
     elif message.document.file_name == 'aio.txt':
         # Save the uploaded file
@@ -588,7 +588,7 @@ async def handle_sub_file(client, message):
                 os.remove(file_path)
                 print(f"Deleted file: {file_path}")
         
-        await message.reply("Processing completed and the output file has been sent back.")
+        await message.reply("<b>Processing completed and the output file has been sent back.</b>")
 
     elif message.document.file_name == '6M22D.txt':
         # Download the file to a predefined path
@@ -612,11 +612,11 @@ async def handle_sub_file(client, message):
                 os.remove(local_file_path)
                 print(f"File {local_file_path} deleted successfully.")
             
-            await message.reply("6M22D.txt uploaded to GitHub and local file deleted.")
+            await message.reply("<b>6M22D.txt uploaded to GitHub and local file deleted.</b>")
         except FileNotFoundError as e:
-            await message.reply(f"File not found: {str(e)}")
+            await message.reply(f"<b>File not found: {str(e)}</b>")
         except Exception as e:
-            await message.reply(f"An error occurred while uploading to GitHub: {str(e)}")
+            await message.reply(f"<b>An error occurred while uploading to GitHub: {str(e)}</b>")
             print(f"Error uploading file: {e}")
 
     elif message.document.file_name == "post.txt":
@@ -664,14 +664,14 @@ async def handle_sub_file(client, message):
                     )
 
             # Inform the user that posting was successful
-            await message.reply("Configs have been sent to the channel.")
+            await message.reply("<b>Configs have been posted to the channel.</b>")
             
             # Clean up: remove the downloaded file
             import os
             os.remove(file_path)
 
         except Exception as e:
-            await message.reply(f"An error occurred: {str(e)}")
+            await message.reply(f"<b>An error occurred: {str(e)}</b>")
 
     else:
         pass
@@ -697,13 +697,13 @@ async def send_random_config(client, message):
                     parse_mode=enums.ParseMode.HTML
                 )
             else:
-                await message.reply("The configs file is empty.")
+                await message.reply("<b>The configs file is empty.</b>")
     except FileNotFoundError:
         await message.reply("<b>VPN Key is not available rn.</b>")
     except json.JSONDecodeError:
-        await message.reply("Error decoding JSON in configs.json.")
+        await message.reply("<b>Error decoding JSON in configs.json.</b>")
     except Exception as e:
-        await message.reply(f"An error occurred: {str(e)}")
+        await message.reply(f"<b>An error occurred: {str(e)}</b>")
 
 # Function to process and send formatted messages
 @app.on_message(filters.private)
@@ -722,11 +722,11 @@ async def send_formatted_message(client, message):
                         chat_id=CHANNEL_ID,
                         text=formatted_text
                     )
-                    await message.reply("Message sent successfully!")
+                    await message.reply("<b>Message sent successfully!</b>")
                 except ValueError:
-                    await message.reply("Invalid format. Use Location|Key|Usable Apps.")
+                    await message.reply("<b>Invalid format. Use Location|Key|Usable Apps.</b>")
             else:
-                await message.reply("Please use the correct format: Location|Key|Usable Apps.")
+                await message.reply("<b>Please use the correct format: Location|Key|Usable Apps.</b>")
     else:
         if message.text is not None:
             message_text = message.text.strip()
