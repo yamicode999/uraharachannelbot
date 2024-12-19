@@ -687,7 +687,6 @@ async def handle_sub_file(client, message):
             await message.reply("<b>Configs have been posted to the channel.</b>")
             
             # Clean up: remove the downloaded file
-            import os
             os.remove(file_path)
 
         except Exception as e:
