@@ -395,27 +395,30 @@ async def start(client, message):
         "<b>✶ /sub - Get subscription link</b>\n"
         "<b>✶ /status - Check server status</b>\n"  # Added /status command
         "<b>✶ You can share your vpn key,</b>\n"
-        "<b>  Just by sending to the bot!</b>\n\n"
+        "<b>   Just by sending to the bot!</b>\n\n"
         "<b>Owner Only:</b>\n"
         "<b>✶ /cmd - Get all commands</b>\n"
         "<b>✶ @onepass_api - Contact Owner</b>\n"
     )
     await message.reply(welcome_message)
 
-@app.on_message(filters.command("cmd") & filters.user(OWNER_ID))
+@app.on_message(filters.command("cmd"))
 async def start(client, message):
-    welcome_message = (
-        "<b>Owner Commands:</b>\n\n"
-        "<b>✶ /fetch - Fetch and save new configs</b>\n"
-        "<b>✶ /fetchall - Fetch and save raw configs</b>\n"
-        "<b>✶ /channel - Change the channel where messages are sent</b>\n"
-        "<b>✶ /authorize - Add new admins</b>\n"
-        "<b>✶ /revoke - Remove admin access</b>\n"
-        "<b>✶ send detrojan.txt - Remove trojan urls</b>\n"
-        "<b>✶ send aio.txt - Change Name and server</b>\n"
-        "<b>✶ send 6M22D.txt - Upload to github</b>\n"
-    )
-    await message.reply(welcome_message)
+    if message.from_user.id == owner_id:
+        welcome_message = (
+            "<b>Owner Commands:</b>\n\n"
+            "<b>✶ /fetch - Fetch and save new configs</b>\n"
+            "<b>✶ /fetchall - Fetch and save raw configs</b>\n"
+            "<b>✶ /channel - Change the channel where messages are sent</b>\n"
+            "<b>✶ /authorize - Add new admins</b>\n"
+            "<b>✶ /revoke - Remove admin access</b>\n"
+            "<b>✶ send detrojan.txt - Remove trojan urls</b>\n"
+            "<b>✶ send aio.txt - Change Name and server</b>\n"
+            "<b>✶ send 6M22D.txt - Upload to github</b>\n"
+        )
+        await message.reply(welcome_message)
+    else:
+        await message.reply("You are not authorized to use this command.")
 
 @app.on_message(filters.command("status"))
 async def server_status(client, message):
@@ -722,31 +725,32 @@ async def send_formatted_message(client, message):
         else:
             await message.reply("Please use the correct format: Location|Key|Usable Apps.")
     else:
-        message_text = message.text.strip()
-        if message_text.startswith(("vmess://", "vless://", "ss://", "hy2://")):
-            # Determine usable apps based on the URL protocol
-            if message_text.startswith("ss://"):
-                usable_apps = "Hiddify, Potatso, Neko Box, Shadowsocks"
-            elif message_text.startswith(("vmess://", "vless://")):
-                usable_apps = "Hiddify, V2Box, V2rayNG, Neko Box"
-            elif message_text.startswith("hy2://"):
-                usable_apps = "Hiddify, Neko Box"
+        if message.text is not None:
+            message_text = message.text.strip()
+            if message_text.startswith(("vmess://", "vless://", "ss://", "hy2://")):
+                # Determine usable apps based on the URL protocol
+                if message_text.startswith("ss://"):
+                    usable_apps = "Hiddify, Potatso, Neko Box, Shadowsocks"
+                elif message_text.startswith(("vmess://", "vless://")):
+                    usable_apps = "Hiddify, V2Box, V2rayNG, Neko Box"
+                elif message_text.startswith("hy2://"):
+                    usable_apps = "Hiddify, Neko Box"
+                else:
+                    usable_apps = "Unknown"
+                
+                # Format the message
+                formatted_text = (
+                    f"<b>Server</b>\n\n"
+                    f"<pre><code>{message_text}</code></pre>\n\n"
+                    f"<b>Usable in: {usable_apps}</b>"
+                )
+                await client.send_message(
+                    chat_id=soto_id,
+                    text=formatted_text
+                )
+                await message.reply("Thank you for sharing your key!")
             else:
-                usable_apps = "Unknown"
-            
-            # Format the message
-            formatted_text = (
-                f"<b>Server</b>\n\n"
-                f"<pre><code>{message_text}</code></pre>\n\n"
-                f"<b>Usable in: {usable_apps}</b>"
-            )
-            await client.send_message(
-                chat_id=soto_id,
-                text=formatted_text
-            )
-            await message.reply("Thank you for sharing your key!")
-        else:
-            await message.reply("Please only send VMess, VLess, Shadowsocks or Hysteria key.")
+                await message.reply("Please only send VMess, VLess, Shadowsocks or Hysteria key.")
 
 # Run the bot
 print("Bot is running...")
