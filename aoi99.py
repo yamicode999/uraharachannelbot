@@ -734,16 +734,24 @@ async def send_formatted_message(client, message):
                 # Determine usable apps based on the URL protocol
                 if message_text.startswith("ss://"):
                     usable_apps = "Hiddify, Potatso, Neko Box, Shadowsocks"
+                    country_info = process_shadowsocks_country(message_text)
+                    
                 elif message_text.startswith(("vmess://", "vless://")):
                     usable_apps = "Hiddify, V2Box, V2rayNG, Neko Box"
+                    country_info = process_vmess_country(message_text)
+                    country_info = process_vless_country(message_text)
+                    
                 elif message_text.startswith("hy2://"):
                     usable_apps = "Hiddify, Neko Box"
+                    country_info = process_hy2_country(message_text)
+                    
                 else:
                     usable_apps = "Unknown"
+                    country_info = "Unknown"
                 
                 # Format the message
                 formatted_text = (
-                    f"<b>Server</b>\n\n"
+                    f"<b>{country_info.strip()}</b>\n\n"
                     f"<pre><code>{message_text}</code></pre>\n\n"
                     f"<b>Usable in: {usable_apps}</b>"
                 )
